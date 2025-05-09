@@ -1,9 +1,11 @@
 import {defineField, defineType} from 'sanity'
+import {CalendarIcon} from '@sanity/icons'
 
 export default defineType({
   name: 'battlepack',
   title: 'Battlepacks',
   type: 'document',
+  icon: CalendarIcon,
   fields: [
     defineField({
       name: 'title',
@@ -37,54 +39,43 @@ export default defineType({
       of: [{type: 'reference', to: {type: 'battleplan'}}],
       validation: Rule => Rule.required().min(3),
     }),
-    defineField({
-      name: 'timer',
-      title: 'Timer',
-      type: 'object',
-      fields: [
-        defineField({
-          name: 'deployment',
-          title: 'Deployment',
-          type: 'number',
-          initialValue: 20,
-          validation: Rule => Rule.required().integer().min(1).max(60),
-        }),
-        defineField({
-          name: 'round1',
-          title: 'Round 1',
-          type: 'number',
-          initialValue: 20,
-          validation: Rule => Rule.required().integer().min(1).max(60),
-        }),
-        defineField({
-          name: 'round2',
-          title: 'Round 2',
-          type: 'number',
-          initialValue: 20,
-          validation: Rule => Rule.required().integer().min(1).max(60),
-        }),
-        defineField({
-          name: 'round3',
-          title: 'Round 3',
-          type: 'number',
-          initialValue: 20,
-          validation: Rule => Rule.required().integer().min(1).max(60),
-        }),
-        defineField({
-          name: 'round4',
-          title: 'Round 4',
-          type: 'number',
-          initialValue: 20,
-          validation: Rule => Rule.required().integer().min(1).max(60),
-        }),
-        defineField({
-          name: 'round5',
-          title: 'Round 5',
-          type: 'number',
-          initialValue: 20,
-          validation: Rule => Rule.required().integer().min(1).max(60),
-        }),
-      ],
-    }),
   ],
+  orderings: [
+  {
+    title: 'Date, Newest first',
+    name: 'dateDesc',
+    by: [
+      {field: 'date', direction: 'desc'}
+    ]
+  },
+  {
+    title: 'Date, Oldest first',
+    name: 'dateAsc',
+    by: [
+      {field: 'date', direction: 'asc'}
+    ]
+  }
+],
+  preview: {
+    select: {
+      title: 'title',
+      date: 'date',
+    },
+    prepare(selection) {
+      const {title, date} = selection
+      let subtitle = ''
+      if (date) {
+        // Format date as DD/MM/YY
+        const d = new Date(date)
+        const day = String(d.getDate()).padStart(2, '0')
+        const month = String(d.getMonth() + 1).padStart(2, '0')
+        const year = String(d.getFullYear())
+        subtitle = `${day}/${month}/${year}`
+      }
+      return {
+        title,
+        subtitle,
+      }
+    },
+  },
 })
